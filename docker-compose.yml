@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    image: prapanjanprabhu/wrapzy:v1
     container_name: wrapzy
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -14,7 +15,7 @@ services:
     image: mysql:8.0
     container_name: mysql-db
     environment:
-      MYSQL_DATABASE: ecommerce
+      MYSQL_DATABASE: one
       MYSQL_USER: django
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: rootpassword
