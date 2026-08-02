@@ -1,0 +1,100 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Top Search{% endblock %}
+
+{% block extra_css %}
+
+
+<style>
+  @media (max-width: 768px) {
+    .sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+    }
+  
+    .main-content {
+      margin-left: 0;
+      padding: 20px;
+    }
+  }
+  
+</style>
+
+{% endblock %}
+
+  {% block content %}
+
+<div class="container mt-5 p-4 shadow-lg rounded bg-white" style="max-width: 700px;">
+  <h3 class="text-center mb-4 text-primary">
+    <i class="bi bi-stars"></i> Manage Top Searches
+  </h3>
+
+  <!-- Form -->
+  <form method="POST" class="row g-3 mb-4">
+    {% csrf_token %}
+    <input type="hidden" name="keyword_id" value="{{ edit_id }}">
+    
+    <div class="col-md-6">
+      <input type="text" name="top_search" class="form-control" placeholder="Enter keyword" required value="{{ edit_keyword }}">
+    </div>
+    <div class="col-md-6">
+      <input type="url" name="redirect_url" class="form-control" placeholder="Enter redirect URL" value="{{ edit_url }}">
+    </div>
+    
+    <div class="col-12 text-end">
+      {% if edit_id %}
+        <button type="submit" name="update" class="btn btn-primary">
+          <i class="bi bi-pencil-square"></i> Update
+        </button>
+      {% else %}
+        <button type="submit" name="add" class="btn btn-success">
+          <i class="bi bi-plus-circle"></i> Add
+        </button>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Top Searches List -->
+  <h5 class="mb-3">📋 Current Keywords</h5>
+  {% for search in top_searches %}
+    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded mb-2 shadow-sm">
+      <div>
+        <span class="fw-semibold">{{ search.keyword }}</span>
+        {% if search.redirect_url %}
+        <a href="{{ search.redirect_url }}" target="_blank" class="ms-2 text-decoration-none text-primary small">
+          <i class="bi bi-box-arrow-up-right"></i> Link
+        </a>
+      {% endif %}
+      
+      </div>
+      <div>
+        <form method="POST" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="keyword_id" value="{{ search.id }}">
+          <button type="submit" name="edit" class="btn btn-sm btn-warning">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </form>
+        <form method="POST" class="d-inline">
+          {% csrf_token %}
+          <input type="hidden" name="keyword_id" value="{{ search.id }}">
+          <button type="submit" name="delete" class="btn btn-sm btn-danger">
+            <i class="bi bi-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">No keywords added yet.</p>
+  {% endfor %}
+
+  <!-- Back -->
+  <div class="text-center mt-4">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+</div>
+
+{% endblock %}

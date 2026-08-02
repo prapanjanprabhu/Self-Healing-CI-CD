@@ -1,0 +1,249 @@
+{% extends 'front_base.html' %}
+
+{% block title %}Wrapzy – Shop Gifts{% endblock %}
+
+{% block extra_css %}
+
+
+  <style>
+
+
+    .products-container {
+      margin-top: 1rem;
+    }
+
+    .card {
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-body h5 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #131921;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .card-body p {
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-body .btn {
+      border-radius: 20px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 500;
+      background: #ff6f61;
+      border: none;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+
+    .card-body .btn:hover {
+      background: #ff8a80;
+    }
+
+    .carousel-item img {
+      height: 220px;
+      object-fit: contain;
+      background: #ffffff;
+      padding: 1rem;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+
+    .dropdown-menu {
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 0.5rem;
+    }
+
+    .dropdown-item {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      color: #131921;
+    }
+
+    .dropdown-item:hover {
+      background: #f0f0f0;
+    }
+
+    .btn-outline-dark,
+    .btn-outline-primary {
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      border-color: #0066c0;
+      color: #0066c0;
+    }
+
+    .btn-outline-dark:hover,
+    .btn-outline-primary:hover {
+      background: #0066c0;
+      color: #fff;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
+      background: #ff6f61;
+    }
+
+    .delivery-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: #f3f3f3;
+      border: 1px solid #0066c0;
+      color: #0066c0;
+      font-size: 1.2rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .delivery-icon:hover {
+      background: #0066c0;
+      color: #fff;
+    }
+
+    .login-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f3f3f3;
+      border: 1px solid #0066c0;
+      color: #2a5298;
+      font-size: 1.2rem;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+
+    .login-icon:hover {
+      background: #0066c0;
+      color: #fff;
+    }
+
+    .login-icon i {
+      font-size: 22px;
+    }
+  </style>
+
+
+  {% endblock %}
+
+  {% block content %}
+  {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'success' }} alert-dismissible fade show" role="alert" style="background-color: #d4edda; border-color: #28a745; color: #131921; font-family: 'Roboto', sans-serif; font-size: 0.95rem; padding: 0.75rem 1.25rem; border-radius: 0.25rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.8rem;"></button>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <script>
+    // Auto-dismiss alerts after 3 seconds
+    document.addEventListener('DOMContentLoaded', function () {
+      const alerts = document.querySelectorAll('.alert-dismissible');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+          bsAlert.close();
+        }, 3000);
+      });
+    });
+  </script>
+  {% endif %}
+
+
+  <!-- 🛍️ Products -->
+  <div class="products-container container">
+    <div class="row">
+      {% for product in products %}
+        <div class="col-md-3 col-sm-6 mb-4">
+          <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+            <div class="card h-100 shadow-sm">
+              <!-- Product Images -->
+              <div id="carousel{{ product.id }}" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <img src="{{ product.image_url }}" class="d-block w-100" alt="Product Image">
+                  </div>
+                  {% for image in product.images.all %}
+                    <div class="carousel-item">
+                      <img src="{{ image.image_url }}" class="d-block w-100" alt="Additional Image">
+                    </div>
+                  {% endfor %}
+                </div>
+                {% if product.images.all|length > 0 %}
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ product.id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                  </button>
+                {% endif %}
+              </div>
+
+              <!-- Product Info -->
+              <div class="card-body text-center">
+                <h5 class="card-title">{{ product.title|truncatechars:50 }}</h5>
+                <p class="text-muted mb-1">Price: ₹{{ product.price }}</p>
+                <p class="text-muted mb-1">Service Fee: ₹{{ product.service_fee }}</p>
+                <p class="fw-bold text-success">Total: ₹{{ product.total_price }}</p>
+                <button class="btn btn-sm mt-2">View Details</button>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center">
+          <p>No products found.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% comment %} <!-- 📞 Contact Section -->
+  <section class="contact text-center">
+    <div class="container d-inline-block text-start">
+      <p class="bi bi-stars me-2">{{ content.about_company }}</p>
+    </div>
+    <hr>
+    <h3 class="mt-4"><i class="bi bi-telephone-outbound me-2"></i>Contact Us</h3>
+    <div class="d-inline-block text-start">
+      <p><i class="bi bi-envelope-fill text-primary me-2"></i><strong>Email:</strong> {{ content.contact_email }}</p>
+      <p><i class="bi bi-phone-fill text-success me-2"></i><strong>Phone:</strong> {{ content.contact_phone }}</p>
+      <p><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Address:</strong> {{ content.contact_address }}</p>
+    </div>
+  </section> {% endcomment %}
+
+
+
+  {% endblock %}

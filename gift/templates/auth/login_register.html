@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wrapzy - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;         /* Vibrant blue for buttons */
+      --secondary-color: #1e40af;       /* Darker blue for hover states */
+      --text-color: #111827;            /* Dark gray for text */
+      --bg-gradient: linear-gradient(135deg, #e0f2fe, #f8fafc); /* Subtle gradient */
+      --card-bg: #ffffff;               /* White card background */
+      --border-color: #d1d5db;          /* Light gray border */
+      --alert-success-bg: #d1fae5;      /* Light green for success */
+      --alert-danger-bg: #fee2e2;       /* Light red for errors */
+    }
+
+    body {
+      background: var(--bg-gradient);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      max-width: 420px;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .auth-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-logo h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .auth-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 0.95rem;
+      background: #f9fafb;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+      background: #ffffff;
+      outline: none;
+    }
+
+    .form-control::placeholder {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    .btn-auth {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      background-color: var(--primary-color);
+      border: none;
+      color: #ffffff;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-auth:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .btn-auth:active {
+      transform: translateY(0);
+    }
+
+    .switch-text {
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--text-color);
+    }
+
+    .switch-link {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .switch-link:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+
+    .alert {
+      border-radius: 8px;
+      font-size: 0.875rem;
+      padding: 0.75rem 1rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background-color: var(--alert-success-bg);
+      color: #065f46;
+    }
+
+    .alert-danger {
+      background-color: var(--alert-danger-bg);
+      color: #991b1b;
+    }
+
+    .alert::before {
+      font-family: 'Bootstrap Icons';
+      margin-right: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .alert-success::before {
+      content: '\F633'; /* Bootstrap Icons check-circle-fill */
+    }
+
+    .alert-danger::before {
+      content: '\F2D7'; /* Bootstrap Icons exclamation-circle-fill */
+    }
+
+    @media (max-width: 768px) {
+      .auth-wrapper {
+        padding: 1rem;
+      }
+
+      .auth-card {
+        padding: 1.5rem;
+        max-width: 360px;
+      }
+
+      .auth-title {
+        font-size: 1.125rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .auth-card {
+        padding: 1.25rem;
+        margin: 0 0.75rem;
+      }
+
+      .auth-logo h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-control {
+        padding: 0.65rem 0.85rem;
+        font-size: 0.9rem;
+      }
+
+      .btn-auth {
+        padding: 0.65rem;
+        font-size: 0.9rem;
+      }
+
+      .alert {
+        font-size: 0.8rem;
+        padding: 0.65rem 0.85rem;
+      }
+
+      .switch-text {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h1>Wrapzy</h1>
+      </div>
+      <div class="auth-title">Sign in to your account</div>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" name="email" id="email" required class="form-control" placeholder="Enter your email" autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" name="password" id="password" required class="form-control" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-auth">Sign In</button>
+      </form>
+
+      <div class="switch-text">
+        New to Wrapzy? <a href="?mode=register" class="switch-link">Create an account</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Auto-dismiss alerts after 3 seconds
+    document.addEventListener('DOMContentLoaded', function () {
+      const alerts = document.querySelectorAll('.alert-dismissible');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+          bsAlert.close();
+        }, 3000);
+      });
+    });
+  </script>
+</body>
+</html>

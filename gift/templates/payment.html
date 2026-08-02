@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Payment</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f7f7f7;
+      font-family: 'Poppins', sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .order-box {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .summary {
+      background-color: #f1f4f8;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .total-price {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0d6efd;
+    }
+
+    .payment-method {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .payment-method:hover {
+      background: #f9f9f9;
+    }
+
+    .btn-confirm {
+      background: #ff9900;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .btn-confirm:hover {
+      background: #e68a00;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="order-box">
+    <h3 class="section-title mb-3">🛍️ Confirm Your Order</h3>
+
+    <!-- Product Summary -->
+    <div class="summary">
+      <p><strong>Product:</strong> {{ product.title }}</p>
+      <p><strong>Price:</strong> ₹{{ product.price }}</p>
+      <p><strong>Service Fee:</strong> ₹{{ product.service_fee }}</p>
+      <p class="total-price">Total Amount: ₹{{ total }}</p>
+    </div>
+
+    <!-- Payment Method -->
+    <form method="POST" action="{% url 'payment_success' %}">
+      {% csrf_token %}
+      <h5 class="section-title mb-3">Select Payment Method</h5>
+
+      <div class="payment-method">
+        <label><input type="radio" name="payment_method" value="card" required> 💳 Credit/Debit Card</label>
+      </div>
+
+      <div class="payment-method">
+        <label><input type="radio" name="payment_method" value="upi"> 🔗 UPI (Google Pay, PhonePe, etc.)</label>
+      </div>
+
+      <div class="payment-method">
+        <label><input type="radio" name="payment_method" value="wallet"> 🧾 Wallet (Amazon Pay, Paytm)</label>
+      </div>
+
+      <div class="payment-method">
+        <label><input type="radio" name="payment_method" value="cod"> 💵 Cash on Delivery</label>
+      </div>
+
+      <button type="submit" class="btn btn-confirm mt-3 w-100">
+        <i class="bi bi-shield-lock-fill me-2"></i>Confirm & Pay ₹{{ total }}
+      </button>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

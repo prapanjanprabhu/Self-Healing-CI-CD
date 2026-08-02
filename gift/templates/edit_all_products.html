@@ -1,0 +1,186 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Edit Product{% endblock %}
+
+{% block extra_css %}
+<style>
+  .product-management {
+    padding: 2rem 0;
+  }
+  
+  .page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .product-table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .product-table thead {
+    background-color: #f8f9fa;
+  }
+  
+  .product-table th {
+    padding: 1rem;
+    text-align: left;
+    color: #34495e;
+    font-weight: 500;
+    border-bottom: 2px solid #ecf0f1;
+  }
+  
+  .product-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #ecf0f1;
+    vertical-align: middle;
+  }
+  
+  .product-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .product-table tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: #f8f9fa;
+    padding: 4px;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .action-btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  
+  .edit-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+  }
+  
+  .edit-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .delete-btn {
+    background-color: #f8f9fa;
+    color: #e74c3c;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .delete-btn:hover {
+    background-color: #f1f1f1;
+  }
+  
+  @media (max-width: 768px) {
+    .product-table-container {
+      border-radius: 0;
+      box-shadow: none;
+    }
+    
+    .product-table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .product-table th,
+    .product-table td {
+      padding: 0.75rem;
+    }
+    
+    .product-image {
+      width: 50px;
+      height: 50px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-management">
+  <div class="container">
+    <h2 class="page-title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 7H4V5H20V7Z" fill="#2c3e50"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3ZM5 9V19H19V9H5Z" fill="#2c3e50"/>
+      </svg>
+      Product Management
+    </h2>
+    
+    <div class="product-table-container">
+      <table class="product-table" >
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Fee</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>
+              {% if product.images.first %}
+                <img src="{{ product.images.first.image_url }}" class="product-image" alt="{{ product.title }}">
+              {% else %}
+                <div class="product-image d-flex align-items-center justify-content-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 16L8.586 11.414C8.961 11.039 9.47 10.828 10 10.828C10.53 10.828 11.039 11.039 11.414 11.414L16 16M14 14L15.586 12.414C15.961 12.039 16.47 11.828 17 11.828C17.53 11.828 18.039 12.039 18.414 12.414L20 14M14 8H14.01M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z" stroke="#95a5a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              {% endif %}
+            </td>
+            <td>{{ product.title }}</td>
+            <td>₹{{ product.price }}</td>
+            <td>₹{{ product.service_fee }}</td>
+            <td>₹{{ product.total_price }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="{% url 'edit_product' product.id %}" class="action-btn edit-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4V11H11V4Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20 13H13V20H20V13Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M13 4L20 11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 13L11 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Edit
+                </a>
+
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

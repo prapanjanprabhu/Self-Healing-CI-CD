@@ -1,0 +1,69 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Dashboard Header -->
+  <div class="mb-4 text-center">
+    <h2 style="color: #1e3c72;"><i class="bi bi-gift-fill me-2"></i>Admin Dashboard</h2>
+    {% comment %} <p class="text-muted">Monitor and manage gift orders with ease.</p> {% endcomment %}
+  </div>
+
+  <!-- Filter Form -->
+  <form method="get" class="row g-3 mb-5">
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Start Date</label>
+      <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">End Date</label>
+      <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+    </div>
+    <div class="col-md-4 d-flex align-items-end gap-2">
+      <button type="submit" class="btn btn-primary w-50"><i class="bi bi-funnel-fill me-1"></i>Filter</button>
+       <a href="{% url 'get_dashboard_context' %}" class="btn btn-outline-dark w-50"><i class="bi bi-x-circle me-1"></i>Clear</a>
+    </div>
+  </form>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 bg-info text-dark">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="card-title mb-1">Total Orders</h5>
+            <h3>{{ total_orders }}</h3>
+          </div>
+          <i class="bi bi-box-seam-fill fs-1 opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 bg-warning text-dark">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="card-title mb-1">Pending Orders</h5>
+            <h3>{{ pending_orders }}</h3>
+          </div>
+          <i class="bi bi-hourglass-split fs-1 opacity-75"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 bg-success text-dark">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="card-title mb-1">Approved Orders</h5>
+            <h3>{{ approved_orders }}</h3>
+          </div>
+          <i class="bi bi-patch-check-fill fs-1 opacity-75"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
