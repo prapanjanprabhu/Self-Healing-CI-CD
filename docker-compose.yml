@@ -4,20 +4,35 @@ services:
     image: prapanjanprabhu/wrapzy:v1
     container_name: wrapzy
     command: python manage.py runserver 0.0.0.0:8000
+
+    env_file:
+      - .env
+
     volumes:
       - .:/app
+
     ports:
       - "8000:8000"
+
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
     container_name: mysql-db
+
     environment:
-      MYSQL_DATABASE: one
-      MYSQL_USER: django
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
     ports:
       - "3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

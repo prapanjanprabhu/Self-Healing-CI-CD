@@ -279,7 +279,7 @@ def admin_login(request):
             request.session['admin_logged_in'] = True
             return redirect('admin_dashboard')
         else:
-            return render(request, 'admin_login.html', {'error': 'Invalid credentials'})
+            return render(request, 'admin.html', {'error': 'Invalid credentials'})
     return render(request, 'admin.html')
 
 
