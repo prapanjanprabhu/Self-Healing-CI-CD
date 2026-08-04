@@ -105,7 +105,7 @@ DATABASES = {
         'NAME': os.environ["DB_NAME"],
         'USER': os.environ["DB_USER"],
         'PASSWORD': os.environ["DB_PASSWORD"],
-        'HOST': os.environ.get("DB_HOST", "db"),
+        'HOST': os.environ.get("DB_HOST", "mysql-service"),
         'PORT': os.environ.get("DB_PORT", "3306"),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",}
