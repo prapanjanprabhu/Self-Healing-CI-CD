@@ -6,7 +6,7 @@ metadata:
   namespace: wrapzy
 
 spec:
-  replicas: 2
+  replicas: 1
 
   selector:
     matchLabels:
@@ -20,27 +20,50 @@ spec:
     spec:
       containers:
         - name: django
-          image: prapanjanprabhu/wrapzy:v2
+          image: prapanjanprabhu/wrapzy:v4
           imagePullPolicy: Always
 
           ports:
             - containerPort: 8000
 
           env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: DJANGO_SECRET_KEY
+
             - name: DB_NAME
-              value: one
+              value: "one"
 
             - name: DB_USER
-              value: django
+              value: "django"
 
             - name: DB_PASSWORD
               value: "0098"
 
             - name: DB_HOST
-              value: mysql-service
+              value: "mysql-service"
 
             - name: DB_PORT
               value: "3306"
+            - name: DJANGO_DEBUG
+              value: "False"
+
+            - name: DJANGO_ALLOWED_HOSTS
+              value: "*"
+
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: ADMIN_USERNAME
+
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-secret
+                  key: ADMIN_PASSWORD
 
           command: ["sh", "-c"]
 

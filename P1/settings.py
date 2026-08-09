@@ -55,9 +55,6 @@ INSTALLED_APPS = [
 
 
 
-RAZORPAY_KEY_ID = os.environ["RAZORPAY_KEY_ID"]
-RAZORPAY_KEY_SECRET = os.environ["RAZORPAY_KEY_SECRET"]
-
 
 
 
@@ -95,7 +92,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "P1.wsgi.application"
 
-
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
