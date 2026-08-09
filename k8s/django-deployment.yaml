@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: django
+  namespace: wrapzy
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: django
+
+  template:
+    metadata:
+      labels:
+        app: django
+
+    spec:
+      containers:
+        - name: django
+          image: prapanjanprabhu/wrapzy:v2
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+
+          env:
+            - name: DB_NAME
+              value: one
+
+            - name: DB_USER
+              value: django
+
+            - name: DB_PASSWORD
+              value: "0098"
+
+            - name: DB_HOST
+              value: mysql-service
+
+            - name: DB_PORT
+              value: "3306"
+
+          command: ["sh", "-c"]
+
+          args:
+            - python manage.py migrate && python manage.py runserver 0.0.0.0:8000
