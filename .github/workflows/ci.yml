@@ -14,14 +14,69 @@ jobs:
     name: Django Tests
     runs-on: ubuntu-latest
 
+    env:
+      # --- Sensitive: sourced from GitHub Secrets, never committed ---
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DB_NAME: ${{ secrets.MYSQL_DATABASE }}
+      DB_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      ADMIN_USERNAME: ${{ secrets.DJANGO_ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.DJANGO_ADMIN_PASSWORD }}
+
+      # --- Structural: not credentials, must match the service container ---
+      # root is required because Django's test runner issues CREATE DATABASE
+      # for test_<DB_NAME>; the image only grants MYSQL_USER rights on DB_NAME.
+      DB_USER: root
+      # settings.py defaults DB_HOST to "mysql-service" (the Minikube Service).
+      # On a runner the database is a mapped port on localhost instead.
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+        ports:
+          - 3306:3306
+        # Without a health check the job proceeds as soon as the container
+        # starts, which is ~20s before mysqld accepts connections.
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # An unset secret expands to an empty string rather than being absent,
+      # so settings.py gets "" instead of raising KeyError. Fail loudly here
+      # instead of surfacing it later as an opaque connection error.
+      - name: Verify required secrets are configured
+        run: |
+          missing=""
+          for name in DJANGO_SECRET_KEY DB_NAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              missing="$missing $name"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing GitHub Secrets for:$missing"
+            echo "Set them under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "All required secrets are present."
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: |
