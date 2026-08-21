@@ -14,63 +14,40 @@ jobs:
     name: Django Tests
     runs-on: ubuntu-latest
 
+    # Throwaway CI values. settings.py reads these via os.environ[...] which
+    # raises KeyError when unset, so every one of them is mandatory.
+    # These are not secrets: the DB is a disposable service container that
+    # is destroyed with the runner.
     env:
-      # --- Sensitive: sourced from GitHub Secrets, never committed ---
-      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-      DB_NAME: ${{ secrets.MYSQL_DATABASE }}
-      DB_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-      ADMIN_USERNAME: ${{ secrets.DJANGO_ADMIN_USERNAME }}
-      ADMIN_PASSWORD: ${{ secrets.DJANGO_ADMIN_PASSWORD }}
-
-      # --- Structural: not credentials, must match the service container ---
-      # root is required because Django's test runner issues CREATE DATABASE
-      # for test_<DB_NAME>; the image only grants MYSQL_USER rights on DB_NAME.
-      DB_USER: root
-      # settings.py defaults DB_HOST to "mysql-service" (the Minikube Service).
-      # On a runner the database is a mapped port on localhost instead.
-      DB_HOST: 127.0.0.1
-      DB_PORT: "3306"
+      DJANGO_SECRET_KEY: ci-insecure-key-not-used-outside-ci
       DJANGO_DEBUG: "False"
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DB_NAME: one
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: ci-admin-password
 
     services:
+      # No --health-cmd here on purpose. Quoting a multi-word health command
+      # inside `options` is unreliable (the string is re-split on whitespace),
+      # and a failing health check makes the whole job abort before any step
+      # runs, with the failure hidden inside the service-container group.
+      # The "Wait for MySQL" step below does the readiness check instead,
+      # where its output is visible.
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: one
         ports:
           - 3306:3306
-        # Without a health check the job proceeds as soon as the container
-        # starts, which is ~20s before mysqld accepts connections.
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-          --health-start-period=30s
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # An unset secret expands to an empty string rather than being absent,
-      # so settings.py gets "" instead of raising KeyError. Fail loudly here
-      # instead of surfacing it later as an opaque connection error.
-      - name: Verify required secrets are configured
-        run: |
-          missing=""
-          for name in DJANGO_SECRET_KEY DB_NAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD; do
-            if [ -z "${!name}" ]; then
-              missing="$missing $name"
-            fi
-          done
-          if [ -n "$missing" ]; then
-            echo "::error::Missing GitHub Secrets for:$missing"
-            echo "Set them under Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-          echo "All required secrets are present."
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -82,6 +59,29 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      # Runs after pip install so mysqlclient (MySQLdb) is importable.
+      # mysqld binds 3306 only once it is ready, so a successful connect is
+      # a real readiness signal rather than a guess.
+      - name: Wait for MySQL
+        run: |
+          python - <<'PY'
+          import sys, time
+          import MySQLdb
+
+          for attempt in range(60):
+              try:
+                  MySQLdb.connect(host="127.0.0.1", port=3306,
+                                  user="root", passwd="root")
+              except MySQLdb.Error as exc:
+                  print(f"waiting for mysql ({exc.args[0]}) ...", flush=True)
+                  time.sleep(2)
+              else:
+                  print(f"mysql ready after ~{attempt * 2}s")
+                  sys.exit(0)
+
+          sys.exit("mysql never became ready after 120s")
+          PY
 
       - name: Django system check
         run: |
